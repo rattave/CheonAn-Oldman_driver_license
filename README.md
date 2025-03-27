@@ -14,6 +14,6 @@ model_FINAL.ipynb | Real Data modeling (Catboost/XGBoost/LightGBM) 4 forecast EC
 old_accident_dummy_eclo_v9.csv | csv file used for model_FINAL
 
 
-More details in..
+More details ..
 
 https://cream-bonobo-f31.notion.site/1bb79f19815e813eb18bf8ee1f143a0b?pvs=4
