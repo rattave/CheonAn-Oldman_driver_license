@@ -1,0 +1,54 @@
+import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
+import folium
+from folium import Marker, GeoJson
+import warnings
+
+# 경고 무시
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=".*unary_union.*")
+
+# 데이터 로드
+group_df = pd.read_csv('grouped (2).csv', encoding='utf-8-sig')
+exter = pd.read_csv('exterior.csv', encoding='utf-8-sig')
+
+# group_df를 GeoDataFrame으로 변환
+grouped_gdf = gpd.GeoDataFrame(group_df, geometry=gpd.points_from_xy(group_df.x, group_df.y), crs="EPSG:4326")
+
+# UTM 좌표계로 변환 후 버퍼 생성
+grouped_gdf = grouped_gdf.to_crs(epsg=32652)
+grouped_gdf['buffer'] = grouped_gdf.geometry.buffer(200)
+
+# 다시 WGS84 좌표계로 변환
+grouped_gdf = grouped_gdf.to_crs(epsg=4326)
+
+# exter를 GeoDataFrame으로 변환
+exter_gdf = gpd.GeoDataFrame(exter, geometry=gpd.points_from_xy(exter.x, exter.y), crs="EPSG:4326")
+
+# 공간적 조인 수행 (exter 지점이 버퍼 내에 있는지 확인)
+joined_gdf = gpd.sjoin(exter_gdf, grouped_gdf[['geometry', 'buffer']], how='inner', predicate='within')
+
+# 각 버퍼 내에 위치한 exter 지점 수를 계산
+buffer_counts = joined_gdf.groupby('index_right').size()
+grouped_gdf['exter_count'] = buffer_counts.reindex(grouped_gdf.index, fill_value=0)
+
+# 버퍼를 하나로 결합
+coverage = grouped_gdf['buffer'].unary_union
+
+# folium 지도 생성
+m = folium.Map(location=[36.841590, 127.172575], zoom_start=11)
+
+# 마커와 버퍼 추가
+for _, row in grouped_gdf.iterrows():
+    folium.Marker([row['y'], row['x']], popup=f"Count: {row['exter_count']}").add_to(m)
+    folium.GeoJson(row['buffer'].__geo_interface__).add_to(m)
+
+# 전체 버퍼 영역 추가
+folium.GeoJson(coverage.__geo_interface__).add_to(m)
+
+# 지도 저장
+m.save('map_with_exter_counts.html')
+
+# 결과를 CSV 파일로 저장
+grouped_gdf.to_csv('grouped_with_exter_counts.csv', encoding='utf-8-sig', index=False)
+m
