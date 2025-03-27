@@ -1,0 +1,28 @@
+import pandas as pd
+from pyproj import Transformer
+
+transformer  = Transformer.from_crs("EPSG:4326", "EPSG:5181", always_xy=True)
+
+current_acc = pd.read_csv('df_cleaned.csv')
+predicred_acc = pd.read_csv('predicted_acc_region.csv')
+exterior = pd.read_csv('total_data.csv')
+
+def transform_coordinates(row):
+    x,y = transformer.transform(row['X'],row['Y'])
+    return pd.Series([x,y])
+
+current_acc[['x', 'y']] = current_acc.apply(transform_coordinates, axis=1)
+
+# 변환된 좌표를 포함한 데이터프레임을 새로운 CSV 파일로 저장
+output_file_path = 'output_coordinates.csv'  # 출력 CSV 파일 경로
+current_acc.to_csv(output_file_path, index=False)
+
+predicred_acc[['x_5181', 'y_5181']] = predicred_acc.apply(transform_coordinates, axis=1)
+
+output_file_path = 'output_coordinates_predAcc.csv'  # 출력 CSV 파일 경로
+predicred_acc.to_csv(output_file_path, index=False)
+
+exterior[['x_5181', 'y_5181']] = exterior.apply(transform_coordinates, axis=1)
+
+output_file_path = 'output_coordinates_exterior.csv'  # 출력 CSV 파일 경로
+exterior.to_csv(output_file_path, index=False)
