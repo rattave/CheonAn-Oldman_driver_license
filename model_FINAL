@@ -1,4 +1,4 @@
-#### In the case of ipynb version is not shown, check this code.
+#### In the case of ipynb version is not displayed, check this code.
 
 ######################### Data Description #########################
 import xgboost as xgb
