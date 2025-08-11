@@ -1,5 +1,5 @@
 # CheonAn-Old-man-driver-license (고령 운전자 면허 갱신 절차 강화 및 교통 정책 제안)
-Won the bigger award in 2024 Cheonan city Data Analysis contest.
+Won the Grand Prize in 2024 Cheonan city Data Analysis contest.
 
 ## 개요 :
 고령 운전자의 사고 심각도 예측 모델을 활용하여 읍면동 별 사고 심각도를 예측하고, 도로 주행 구간을 선정한다. 면허 갱신 관련 정책을 제시하고, 개선안 도입 시 사고 절감 편익을 산출한다.
